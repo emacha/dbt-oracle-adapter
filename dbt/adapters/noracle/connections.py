@@ -63,13 +63,8 @@ class NoracleConnectionManager(SQLConnectionManager):
         return "OK"
 
     def cancel(self, connection):
-        raise RuntimeError("Not fully implemented yet!")
-        # tid = connection.handle.transaction_id()
-        # sql = "select cancel_transaction({})".format(tid)
-        # logger.debug("Cancelling query '{}' ({})".format(connection_name, pid))
-        # _, cursor = self.add_query(sql, "master")
-        # res = cursor.fetchone()
-        # logger.debug("Canceled query '{}': {}".format(connection_name, res))
+        logger.debug("Cancelling transaction!")
+        connection.cancel()
 
     @contextmanager
     def exception_handler(self, sql: str):
