@@ -12,6 +12,7 @@ packages = [
 python = "^3.8"
 dbt = "^0.19.0"
 cx-Oracle = "^8.1.0"
+flake8 = "^3.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
