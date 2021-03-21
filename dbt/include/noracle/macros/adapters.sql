@@ -19,3 +19,13 @@
   {{ exceptions.raise_compiler_error(msg) }}
 
 {% endmacro %}
+
+
+{% macro noracle__list_schemas(database) -%}
+  {% set sql %}
+    select distinct username as schema_name
+    from sys.all_users
+  {% endset %}
+  
+  {{ return(run_query(sql)) }}
+{% endmacro %}
