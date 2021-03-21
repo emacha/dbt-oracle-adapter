@@ -49,7 +49,9 @@ class NoracleConnectionManager(SQLConnectionManager):
                 encoding="UTF-8",
             )
         except cx_Oracle.Error as exc:
-            logger.error(f"Failed to connect: {exc}")
+            connection.state = "fail"
+            connection.handle = None
+            raise dbt.exceptions.FailedToConnectException(str(exc))
 
         connection.state = "open"
         connection.handle = handle
