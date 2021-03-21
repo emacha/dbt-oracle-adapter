@@ -9,3 +9,6 @@ class NoracleAdapter(SQLAdapter):
     def date_function(cls):
         raise RuntimeError("Not fully implemented yet!")
         return 'datenow()'
+
+    def debug_query(self) -> None:
+        self.execute('select 1 as id from dual')
