@@ -8,8 +8,7 @@ class NoracleAdapter(SQLAdapter):
 
     @classmethod
     def date_function(cls):
-        raise RuntimeError("Not fully implemented yet!")
-        return "datenow()"
+        return "select current_date from dual"
 
     def debug_query(self) -> None:
         self.execute("select 1 as id from dual")
