@@ -8,6 +8,7 @@ from dbt.adapters.base import Credentials
 from dbt.adapters.sql import SQLConnectionManager
 from dbt.contracts.connection import Connection
 from dbt.logger import GLOBAL_LOGGER as logger
+from dbt import flags
 
 import dbt
 
@@ -121,3 +122,40 @@ class NoracleConnectionManager(SQLConnectionManager):
             )
 
             return connection, cursor
+
+    def begin(self):
+        connection = self.get_thread_connection()
+
+        if flags.STRICT_MODE:
+            if not isinstance(connection, Connection):
+                raise dbt.exceptions.CompilerException(
+                    f'In begin, got {connection} - not a Connection!'
+                )
+
+        if connection.transaction_open is True:
+            raise dbt.exceptions.InternalException(
+                'Tried to begin a new transaction on connection "{}", but '
+                'it already had one open!'.format(connection.name))
+
+        connection.handle.begin()
+        connection.transaction_open = True
+        return connection
+
+    def commit(self):
+        connection = self.get_thread_connection()
+        if flags.STRICT_MODE:
+            if not isinstance(connection, Connection):
+                raise dbt.exceptions.CompilerException(
+                    f'In commit, got {connection} - not a Connection!'
+                )
+
+        if connection.transaction_open is False:
+            raise dbt.exceptions.InternalException(
+                'Tried to commit transaction on connection "{}", but '
+                'it does not have one open!'.format(connection.name))
+
+        logger.debug('On {}: COMMIT'.format(connection.name))
+        connection.handle.commit()
+        connection.transaction_open = False
+
+        return connection
