@@ -6,6 +6,75 @@
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}
 
+{% macro noracle__alter_column_type(relation) -%}
+  {% set msg -%}
+    get_columns_in_relation not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
+{% macro noracle__check_schema_exists(relation) -%}
+  {% set msg -%}
+    get_columns_in_relation not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
+{% macro noracle__create_schema(relation) -%}
+  {% set msg -%}
+    get_columns_in_relation not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
+{% macro noracle__drop_relation(relation) -%}
+  {% if relation.type == 'view' -%}
+    {% call statement('drop_relation', auto_begin=False) -%}
+      BEGIN
+        EXECUTE IMMEDIATE 'drop view ' || '{{relation.name}}';
+      EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLCODE != -942 THEN
+              RAISE;
+            END IF;
+      END;
+    {%- endcall %}
+   {% elif relation.type == 'table'%}
+    {% call statement('drop_relation', auto_begin=False) -%}
+      BEGIN
+        EXECUTE IMMEDIATE 'drop table ' || '{{relation.name}}';
+      EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLCODE != -942 THEN
+              RAISE;
+            END IF;
+      END;
+    {%- endcall %}
+   {%- else -%} invalid target name
+   {% endif %}
+{% endmacro %}
+
+{% macro noracle__drop_schema(relation) -%}
+  {% set msg -%}
+    drop_schema not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
+{% macro noracle__rename_relation(relation) -%}
+  {% set msg -%}
+    rename_relation not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
+{% macro noracle__truncate_relation(relation) -%}
+  {% set msg -%}
+    truncate_relation not implemented for noracle
+  {%- endset %}
+  {{ exceptions.raise_compiler_error(msg) }}
+{% endmacro %}
+
 
 {% macro noracle__list_relations_without_caching(schema_relation) %}
   {% call statement('list_relations_without_caching', fetch_result=True, auto_begin=False) -%}
