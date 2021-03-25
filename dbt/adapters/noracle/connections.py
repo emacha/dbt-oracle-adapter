@@ -111,10 +111,10 @@ class NoracleConnectionManager(SQLConnectionManager):
             cursor = connection.handle.cursor()
 
             if bindings is not None:
-                logger.info("Bindings are not implemented for Oracle!")
-                logger.info(f"bindings: {bindings}")
+                cursor.execute(sql, bindings)
+            else:
+                cursor.execute(sql)
 
-            cursor.execute(sql)
             logger.debug(
                 "SQL status: {status} in {elapsed:0.2f} seconds",
                 status=self.get_response(cursor),
