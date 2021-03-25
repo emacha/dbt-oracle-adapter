@@ -25,7 +25,7 @@ the problem is.
 
 {% macro noracle__alter_column_type(relation) -%}
   {% set msg -%}
-    get_columns_in_relation not implemented for noracle
+    alter_column_type not implemented for noracle
   {%- endset %}
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}
@@ -33,7 +33,7 @@ the problem is.
 
 {% macro noracle__check_schema_exists(relation) -%}
   {% set msg -%}
-    get_columns_in_relation not implemented for noracle
+    check_schema_exists not implemented for noracle
   {%- endset %}
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}
@@ -41,7 +41,7 @@ the problem is.
 
 {% macro noracle__create_schema(relation) -%}
   {% set msg -%}
-    get_columns_in_relation not implemented for noracle
+    create_schema not implemented for noracle
   {%- endset %}
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}
