@@ -84,10 +84,9 @@
 {% endmacro %}
 
 {% macro noracle__truncate_relation(relation) -%}
-  {% set msg -%}
-    truncate_relation not implemented for noracle
-  {%- endset %}
-  {{ exceptions.raise_compiler_error(msg) }}
+  {% call statement('truncate_relation', auto_begin=False) -%}
+    truncate table {{relation.include(database=false)}}
+  {%- endcall %}
 {% endmacro %}
 
 
