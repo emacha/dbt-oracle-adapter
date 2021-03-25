@@ -1,3 +1,4 @@
+import agate
 from typing import Dict
 from dbt.adapters.sql import SQLAdapter
 from dbt.utils import filter_null_values
@@ -32,3 +33,33 @@ class NoracleAdapter(SQLAdapter):
             'identifier': identifier,
             'schema': schema,
         })
+
+    @classmethod
+    def convert_text_type(cls, agate_table: agate.Table, col_idx: int) -> str:
+        return "varchar(4000)"
+
+    @classmethod
+    def convert_number_type(
+        cls, agate_table: agate.Table, col_idx: int
+    ) -> str:
+        return "number"
+
+    @classmethod
+    def convert_boolean_type(
+            cls, agate_table: agate.Table, col_idx: int
+    ) -> str:
+        return "number(1)"
+
+    @classmethod
+    def convert_datetime_type(
+            cls, agate_table: agate.Table, col_idx: int
+    ) -> str:
+        return "timestamp"
+
+    @classmethod
+    def convert_date_type(cls, agate_table: agate.Table, col_idx: int) -> str:
+        return "date"
+
+    @classmethod
+    def convert_time_type(cls, agate_table: agate.Table, col_idx: int) -> str:
+        return "timestamp with time zone"
