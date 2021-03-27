@@ -40,3 +40,6 @@ models:
       # Applies to all files under models/example/
       example:
           materialized: view
+
+seeds:
+  +quote_columns: false
