@@ -82,3 +82,41 @@
 
   {{ return(load_result('list_schemas').table) }}
 {% endmacro %}
+
+
+{% macro noracle__drop_schema(database_name, schema_name) -%}
+  {% set typename = adapter.type() %}
+
+  {%- call statement('drop_schema', fetch_result=False) -%}
+  drop user {{database_name}} CASCADE
+  {%- endcall -%}
+
+{% endmacro %}
+
+
+{% macro noracle__create_schema(database_name, schema_name) -%}
+  {% set typename = adapter.type() %}
+  {% set grant_types = ["create session", "create table", "create view", "create any trigger", "create any procedure", "create sequence",
+                        "create synonym", "unlimited tablespace"] %}
+
+  {%- call statement('create_user', fetch_result=False) -%}
+    create user {{database_name}}
+    identified by 1234
+    default tablespace USERS
+    temporary tablespace TEMP
+  {%- endcall -%}
+
+  {% for grant_type in grant_types %}
+    {%- call statement('add_grant', fetch_result=False) -%}
+      grant {{grant_type}} to {{database_name}}
+  {%- endcall -%}
+  {% endfor %}
+{% endmacro %}
+
+
+{% macro noracle__check_schema_exists(information_schema, schema) -%}
+  {% call statement('check_schema_exists', fetch_result=True, auto_begin=False) %}
+    select count(*) from sys.all_users where username = upper('{{ schema }}')
+  {% endcall %}
+  {{ return(load_result('check_schema_exists').table) }}
+{% endmacro %}
