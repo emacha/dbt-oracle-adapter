@@ -28,25 +28,16 @@
 
 
 {% macro noracle__rename_relation(from_relation, to_relation) -%}
-  {% if from_relation.type == 'view' -%}
-    {% if from_relation.schema == to_relation.schema -%}
-      {% call statement('rename_relation') -%}
-        rename {{from_relation.identifier}} to {{to_relation.identifier}}
-      {%- endcall %}
-    {%- else -%}
-    
+  {% if from_relation.schema == to_relation.schema -%}
+    {% call statement('rename_relation') -%}
+      rename {{from_relation.identifier}} to {{to_relation.identifier}}
+    {%- endcall %}
+  {%- else -%}
     {% set msg -%}
       Cannot rename views in different schemas!
     {%- endset %}
     {{ exceptions.raise_compiler_error(msg) }}
     {% endif %}
-
-  {% elif from_relation.type == 'table'%}
-    {% call statement('rename_relation') -%}
-      alter table {{from_relation.schema}}.{{from_relation.identifier}}
-      rename to {{to_relation.identifier}}
-    {%- endcall %}
-  {% endif %}
 {% endmacro %}
 
 {% macro noracle__truncate_relation(relation) -%}
