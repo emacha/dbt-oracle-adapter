@@ -7,14 +7,6 @@ This way at least the error message points us towards where
 the problem is.
 #}
 
-{% macro noracle__get_columns_in_relation(relation) -%}
-  {% set msg -%}
-    get_columns_in_relation not implemented for noracle
-  {%- endset %}
-  {{ exceptions.raise_compiler_error(msg) }}
-{% endmacro %}
-
-
 {% macro noracle__alter_column_type(relation) -%}
   {% set msg -%}
     alter_column_type not implemented for noracle

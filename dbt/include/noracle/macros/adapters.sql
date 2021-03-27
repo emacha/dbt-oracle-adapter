@@ -142,3 +142,19 @@
   {% endcall %}
   {{ return(load_result('check_schema_exists').table) }}
 {% endmacro %}
+
+
+{% macro noracle__get_columns_in_relation(relation) -%}
+  {% call statement('get_columns_in_relation', fetch_result=True) %}
+  select
+    column_name as "column_name",
+    data_type as "data_type",
+    data_length as "character_maximum_length",
+    data_precision as "numeric_precision",
+    data_scale as "numeric_scale"
+  from all_tab_columns
+  where owner = upper('{{ relation.schema }}')
+    and table_name = upper('{{ relation.identifier }}')
+  {% endcall %}
+  {{ return(load_result('get_columns_in_relation').table) }}
+{% endmacro %}
