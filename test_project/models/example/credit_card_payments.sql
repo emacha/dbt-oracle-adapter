@@ -1,3 +1,4 @@
+{{ config(materialized='table') }}
 
 select *
 from {{ source('dbt_testing', 'raw_payments') }}

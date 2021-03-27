@@ -2,8 +2,8 @@
 version: 2
 
 models:
-    - name: my_first_dbt_model
-      description: "A starter dbt model"
+    - name: bank_transfer_payments
+      description: "Payments table filtered on bank_transfer"
       columns:
           - name: id
             description: "The primary key for this table"
@@ -11,13 +11,19 @@ models:
                 - unique
                 - not_null
 
-    - name: my_second_dbt_model
-      description: "A starter dbt model"
-      columns:
-          - name: id
-            description: "The primary key for this table"
+          - name: order_id
+            description: "The order id. The same order can have different payment methods"
             tests:
-                - unique
+                - not_null
+
+          - name: payment_method
+            description: "Method used to pay"
+            tests:
+                - not_null
+
+          - name: amount
+            description: "Order amount"
+            tests:
                 - not_null
 
 sources:
