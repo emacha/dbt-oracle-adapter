@@ -9,7 +9,6 @@ but I want to at least reach a point where it's usable.
 Without being more trouble than it's worth.
 
 TODO:
-- Implement the rest of materializations
 - Macros in `not_implemented.sql`
 - tests
 - Use the dbt 'official' testing framework thing
@@ -17,4 +16,5 @@ TODO:
 - stick it in github
     - Use their docker thing for the test db?
     - CI/CD with actions
-- Rename all the terrible placeholder names (noracle/oracle-fresh)
+- Rename all the terrible placeholder names (noracle)
+- incremental model probably hard to implement, leave for later.
