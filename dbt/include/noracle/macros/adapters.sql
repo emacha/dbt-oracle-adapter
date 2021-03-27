@@ -28,17 +28,39 @@
 
 
 {% macro noracle__rename_relation(from_relation, to_relation) -%}
-  {% if from_relation.schema == to_relation.schema -%}
+  {% if from_relation.type != to_relation.type -%}
+  {{ exceptions.raise_compiler_error('Cannot rename view into tables or vice-versa') }}
+  {% endif %}
+
+  {% if from_relation.type == 'view' -%}
+    {# We cannot rename view in other schemas with Oracle. So we need to drop and recreate it. #}}
+    {%- call statement('get_view_DDL', fetch_result=true) %}
+      select text 
+      from all_views 
+      where owner = upper('{{ from_relation.schema }}')
+        and view_name = upper('{{ from_relation.identifier }}')
+    {%- endcall -%}
+
+    {% set sql -%}
+      create or replace view {{to_relation}} as
+      {{ load_result('get_view_DDL')['data'][0][0] }}
+    {%- endset %}
+    {% do run_query(sql) %}
+
+    {% set sql -%}
+      drop view {{from_relation}}
+    {%- endset %}
+    {% do run_query(sql) %}
+
+  {% elif from_relation.type == 'table' -%}
     {% call statement('rename_relation') -%}
-      rename {{from_relation.identifier}} to {{to_relation.identifier}}
+      alter table {{from_relation}} rename to {{to_relation.identifier}}
     {%- endcall %}
   {%- else -%}
-    {% set msg -%}
-      Cannot rename views in different schemas!
-    {%- endset %}
-    {{ exceptions.raise_compiler_error(msg) }}
-    {% endif %}
+  {{ exceptions.raise_compiler_error('Rename not implemented for {{from_relation.type}}') }}
+  {% endif %}
 {% endmacro %}
+
 
 {% macro noracle__truncate_relation(relation) -%}
   {% call statement('truncate_relation', auto_begin=False) -%}
