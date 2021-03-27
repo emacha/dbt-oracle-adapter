@@ -3,10 +3,12 @@ from typing import Dict
 from dbt.adapters.sql import SQLAdapter
 from dbt.utils import filter_null_values
 from dbt.adapters.noracle import NoracleConnectionManager
+from dbt.adapters.noracle.relation import NoracleRelation
 
 
 class NoracleAdapter(SQLAdapter):
     ConnectionManager = NoracleConnectionManager
+    Relation = NoracleRelation
 
     @classmethod
     def date_function(cls):
