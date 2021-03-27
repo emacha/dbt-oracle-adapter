@@ -91,9 +91,3 @@
 
   {{ return(load_result('list_schemas').table) }}
 {% endmacro %}
-
-
--- Macro to override ref and to render identifiers without a database.
-{% macro ref(model_name) %}
-  {% do return(builtins.ref(model_name).include(database=false)) %}
-{% endmacro %}
