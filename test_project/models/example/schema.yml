@@ -10,6 +10,9 @@ models:
             tests:
                 - unique
                 - not_null
+                - relationships:
+                    to: ref('raw_payments')
+                    field: id
 
           - name: order_id
             description: "The order id. The same order can have different payment methods"
@@ -20,6 +23,8 @@ models:
             description: "Method used to pay"
             tests:
                 - not_null
+                - accepted_values:
+                    values: ['bank_transfer']
 
           - name: amount
             description: "Order amount"
