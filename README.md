@@ -10,7 +10,6 @@ Without being more trouble than it's worth.
 
 TODO:
 - Macros in `not_implemented.sql`
-- tests
 - Use the dbt 'official' testing framework thing
 - A decent readme
 - stick it in github
