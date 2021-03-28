@@ -148,13 +148,17 @@
   {% call statement('get_columns_in_relation', fetch_result=True) %}
   select
     column_name as "column_name",
-    data_type as "data_type",
-    data_length as "character_maximum_length",
-    data_precision as "numeric_precision",
-    data_scale as "numeric_scale"
+    data_type as "data_type"
   from all_tab_columns
   where owner = upper('{{ relation.schema }}')
     and table_name = upper('{{ relation.identifier }}')
   {% endcall %}
-  {{ return(load_result('get_columns_in_relation').table) }}
+
+  {% set result = load_result('get_columns_in_relation').table.rows %}}
+  {% set columns = [] %}
+  {% for row in result %}
+    {% do columns.append(api.Column.from_description(row['column_name'], row['data_type'])) %}
+  {% endfor %}
+  {% do return(columns) %}
+
 {% endmacro %}

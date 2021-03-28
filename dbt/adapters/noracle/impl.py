@@ -65,3 +65,70 @@ class NoracleAdapter(SQLAdapter):
     @classmethod
     def convert_time_type(cls, agate_table: agate.Table, col_idx: int) -> str:
         return "timestamp with time zone"
+
+    def get_rows_different_sql(
+        self,
+        relation_a,
+        relation_b,
+        column_names=None,
+        except_operator: str = 'EXCEPT',
+    ) -> str:
+        """Generate SQL for a query that returns a single row with a two
+        columns: the number of rows that are different between the two
+        relations and the number of mismatched rows.
+        """
+        # This method only really exists for test reasons.
+        if column_names is None:
+            columns = self.get_columns_in_relation(relation_a)
+            names = sorted((self.quote(c.name) for c in columns))
+        else:
+            names = sorted((self.quote(n) for n in column_names))
+        columns_csv = ', '.join(names)
+
+        sql = COLUMNS_EQUAL_SQL.format(
+            columns=columns_csv,
+            relation_a=str(relation_a),
+            relation_b=str(relation_b),
+            except_op=except_operator,
+        )
+
+        return sql
+
+
+COLUMNS_EQUAL_SQL = """
+with simmetric_difference as (
+    select {columns} from {relation_a}
+    minus
+    select {columns} from {relation_b}
+
+    union all
+
+    select {columns} from {relation_b}
+    minus
+    select {columns} from {relation_a}
+),
+table_a as (
+    select count(*) as num_rows from {relation_a}
+),
+table_b as (
+    select count(*) as num_rows from {relation_b}
+),
+row_count_diff as (
+    select
+        1 as id,
+        table_a.num_rows - table_b.num_rows as difference
+    from table_a, table_b
+),
+diff_count as (
+    select
+        1 as id,
+        (select count(*) from simmetric_difference) as num_missing
+    from dual
+)
+select
+    row_count_diff.difference as row_count_difference,
+    diff_count.num_missing as num_mismatched
+from row_count_diff
+inner join diff_count
+    using (id)
+""".strip()
