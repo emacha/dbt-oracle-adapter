@@ -1,9 +1,9 @@
 
 {% macro noracle__drop_relation(relation) -%}
   {% if relation.type == 'view' -%}
-    {% call statement('drop_relation', auto_begin=False) -%}
+    {% call statement('drop_relation') -%}
       BEGIN
-        EXECUTE IMMEDIATE 'drop view ' || '{{relation.name}}';
+        EXECUTE IMMEDIATE 'drop view ' || '{{relation}}';
       EXCEPTION
         WHEN OTHERS THEN
             IF SQLCODE != -942 THEN
@@ -12,9 +12,9 @@
       END;
     {%- endcall %}
    {% elif relation.type == 'table'%}
-    {% call statement('drop_relation', auto_begin=False) -%}
+    {% call statement('drop_relation') -%}
       BEGIN
-        EXECUTE IMMEDIATE 'drop table ' || '{{relation.name}}';
+        EXECUTE IMMEDIATE 'drop table ' || '{{relation}}';
       EXCEPTION
         WHEN OTHERS THEN
             IF SQLCODE != -942 THEN
@@ -28,11 +28,7 @@
 
 
 {% macro noracle__rename_relation(from_relation, to_relation) -%}
-  {% if from_relation.type != to_relation.type -%}
-  {{ exceptions.raise_compiler_error('Cannot rename view into tables or vice-versa') }}
-  {% endif %}
-
-  {% if from_relation.type == 'view' -%}
+  {% if from_relation.type == 'view' and to_relation.type == 'view' -%}
     {# We cannot rename view in other schemas with Oracle. So we need to drop and recreate it. #}}
     {%- call statement('get_view_DDL', fetch_result=true) %}
       select text 
@@ -48,14 +44,28 @@
     {% do run_query(sql) %}
 
     {% set sql -%}
-      drop view {{from_relation}}
+      drop view {{from_relation}} cascade constraints
     {%- endset %}
     {% do run_query(sql) %}
 
-  {% elif from_relation.type == 'table' -%}
+  {% elif from_relation.type == 'table' and to_relation.type == 'table' -%}
     {% call statement('rename_relation') -%}
       alter table {{from_relation}} rename to {{to_relation.identifier}}
     {%- endcall %}
+  
+  {% elif from_relation.type == 'view' and to_relation.type == 'table' -%}
+    {% call statement('rename_relation') -%}
+      create table {{to_relation}} as
+      select * from {{from_relation}}
+    {%- endcall %}
+
+    {% call statement('drop_old') -%}
+      drop view {{from_relation}}
+    {%- endcall %}
+  
+  {% elif from_relation.type == 'table' and to_relation.type == 'view' -%}
+  {{ exceptions.raise_compiler_error('Cannot rename table into view!') }}
+
   {%- else -%}
   {{ exceptions.raise_compiler_error('Rename not implemented for {{from_relation.type}}') }}
   {% endif %}
@@ -63,14 +73,14 @@
 
 
 {% macro noracle__truncate_relation(relation) -%}
-  {% call statement('truncate_relation', auto_begin=False) -%}
+  {% call statement('truncate_relation') -%}
     truncate table {{relation.include(database=false)}}
   {%- endcall %}
 {% endmacro %}
 
 
 {% macro noracle__list_relations_without_caching(schema_relation) %}
-  {% call statement('list_relations_without_caching', fetch_result=True, auto_begin=False) -%}
+  {% call statement('list_relations_without_caching', fetch_result=True) -%}
     select
     upper('{{schema_relation.database}}') as database,
     table_name as name,
@@ -97,7 +107,7 @@
 
 
 {% macro noracle__list_schemas(database) -%}
-  {% call statement('list_schemas', fetch_result=True, auto_begin=False) -%}
+  {% call statement('list_schemas', fetch_result=True) -%}
     select distinct username as schema_name
     from sys.all_users
   {% endcall %}
@@ -109,8 +119,8 @@
 {% macro noracle__drop_schema(database_name, schema_name) -%}
   {% set typename = adapter.type() %}
 
-  {%- call statement('drop_schema', fetch_result=False) -%}
-  drop user {{database_name}} CASCADE
+  {%- call statement('drop_schema') -%}
+  drop user {{database_name}} cascade
   {%- endcall -%}
 
 {% endmacro %}
@@ -121,7 +131,7 @@
   {% set grant_types = ["create session", "create table", "create view", "create any trigger", "create any procedure", "create sequence",
                         "create synonym", "unlimited tablespace"] %}
 
-  {%- call statement('create_user', fetch_result=False) -%}
+  {%- call statement('create_user') -%}
     create user {{database_name}}
     identified by 1234
     default tablespace USERS
@@ -129,15 +139,15 @@
   {%- endcall -%}
 
   {% for grant_type in grant_types %}
-    {%- call statement('add_grant', fetch_result=False) -%}
-      grant {{grant_type}} to {{database_name}}
+    {%- call statement('add_grant') -%}
+      grant all privileges to {{database_name}} identified by 1234
   {%- endcall -%}
   {% endfor %}
 {% endmacro %}
 
 
 {% macro noracle__check_schema_exists(information_schema, schema) -%}
-  {% call statement('check_schema_exists', fetch_result=True, auto_begin=False) %}
+  {% call statement('check_schema_exists', fetch_result=True) %}
     select count(*) from sys.all_users where username = upper('{{ schema }}')
   {% endcall %}
   {{ return(load_result('check_schema_exists').table) }}
