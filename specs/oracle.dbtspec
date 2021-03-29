@@ -15,11 +15,18 @@ projects:
         {{ config(materialized='table') }}
         select * from {{ source('raw', 'seed') }}
 
-sequences:
-#  test_dbt_empty: empty
+sequences:  
   test_dbt_base: base
-#  test_dbt_ephemeral: ephemeral
+  test_dbt_ephemeral: ephemeral
+  test_dbt_schema_test: schema_test
+
+# This one is just not implemented
 #  test_dbt_incremental: incremental
-#  test_dbt_data_test: data_test
-#  test_dbt_schema_test: schema_test
+
+# Test fails, but it's an issue with framework I think. Using test_project
+# On ephemeral models passes both schema and data tests
 #  test_dbt_ephemeral_data_tests: data_test_ephemeral_models
+
+# I think they both fail to create the schema, so errors are thrown
+# test_dbt_data_test: data_test
+# test_dbt_empty: empty
