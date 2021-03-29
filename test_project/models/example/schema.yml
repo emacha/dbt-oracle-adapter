@@ -2,6 +2,33 @@
 version: 2
 
 models:
+    - name: ephemeral_recurse
+      description: "Query created using a CTE from another CTE"
+      columns:
+          - name: id
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+                - relationships:
+                    to: ref('raw_payments')
+                    field: id
+
+          - name: order_id
+            description: "The order id. The same order can have different payment methods"
+            tests:
+                - not_null
+
+          - name: payment_method
+            description: "Method used to pay"
+            tests:
+                - not_null
+
+          - name: amount
+            description: "Order amount"
+            tests:
+                - not_null
+
     - name: bank_transfer_payments
       description: "Payments table filtered on bank_transfer"
       columns:
@@ -32,6 +59,6 @@ models:
                 - not_null
 
 sources:
-  - name: dbt_testing
+  - name: dbt_test_user
     tables:
       - name: raw_payments
