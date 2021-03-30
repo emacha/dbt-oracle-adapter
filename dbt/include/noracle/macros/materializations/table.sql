@@ -1,6 +1,10 @@
 {% macro noracle__create_table_as(temporary, relation, sql) -%}
-  create {% if temporary: -%}global temporary{%- endif %} table
-    {{ relation }}
+  {% if temporary: -%}
+  create global temporary table {{ relation }}
+  on commit preserve rows
+  {% else %}
+  create table {{ relation }}
+  {% endif %}
   as 
     {{ sql }}
 {% endmacro %}
