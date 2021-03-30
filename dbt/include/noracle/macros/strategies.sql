@@ -1,5 +1,15 @@
 {% macro noracle__snapshot_merge_sql(target, source, insert_cols) -%}
-    {%- set insert_cols_csv = insert_cols | join(', ') -%}
+    {% set insert_cols_dest -%}
+    {%- for col in insert_cols -%}
+    DBT_INTERNAL_DEST.{{col}}{%- if not loop.last -%}, {%- endif -%}
+    {%- endfor -%}
+    {%- endset %}
+
+    {% set insert_cols_source -%}
+    {%- for col in insert_cols -%}
+    DBT_INTERNAL_SOURCE.{{col}}{%- if not loop.last -%}, {%- endif -%}
+    {%- endfor -%}
+    {%- endset %}
 
     merge into {{ target }} DBT_INTERNAL_DEST
     using {{ source }} DBT_INTERNAL_SOURCE
@@ -11,13 +21,12 @@
     where DBT_INTERNAL_DEST.dbt_valid_to is null
       and DBT_INTERNAL_SOURCE.dbt_change_type in ('update', 'delete')
 
-    {% if insert_cols_csv|length > 0 %}
+    {% if insert_cols|length > 0 %}
     when not matched
-        then insert ({{ insert_cols_csv }})
-        values ({{ insert_cols_csv }})
+        then insert ({{ insert_cols_dest }})
+        values ({{ insert_cols_source }})
     where DBT_INTERNAL_SOURCE.dbt_change_type = 'insert'
     {% endif %}
-
 {% endmacro %}
 
 

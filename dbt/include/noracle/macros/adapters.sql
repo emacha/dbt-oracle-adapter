@@ -172,7 +172,6 @@
 {% endmacro %}
 
 
-
 {% macro noracle__current_timestamp() -%}
   {% call statement('current_timestamp', fetch_result=True) %}
     select localtimestamp from dual
