@@ -94,6 +94,14 @@ class NoracleAdapter(SQLAdapter):
 
         return sql
 
+    def timestamp_add_sql(
+        self, add_to: str, number: int = 1, interval: str = 'hour'
+    ) -> str:
+        if interval != "hour":
+            raise NotImplementedError(f"Interval of type {interval} not allowed, use 'hour'")
+
+        return f"{add_to} + interval '{number}' {interval}"
+
 
 COLUMNS_EQUAL_SQL = """
 with simmetric_difference as (
