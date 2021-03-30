@@ -138,11 +138,9 @@
     temporary tablespace TEMP
   {%- endcall -%}
 
-  {% for grant_type in grant_types %}
-    {%- call statement('add_grant') -%}
-      grant all privileges to {{database_name}} identified by 1234
+  {%- call statement('add_grant') -%}
+    grant all privileges to {{database_name}} identified by 1234
   {%- endcall -%}
-  {% endfor %}
 {% endmacro %}
 
 
@@ -172,3 +170,12 @@
   {% do return(columns) %}
 
 {% endmacro %}
+
+
+
+{% macro noracle__current_timestamp() -%}
+  {% call statement('current_timestamp', fetch_result=True) %}
+    select localtimestamp from dual
+  {% endcall %}
+  {{ return(load_result('current_timestamp')['data'][0][0]) }}
+{%- endmacro %}
