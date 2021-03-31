@@ -35,6 +35,21 @@
 {% endmacro %}
 
 
+
+{#
+Oracle cannot take an unquoted date as a value. So even though
+the these 2 predicate branches are basically indentical for column check and
+timestamp we need 2 arms with the only change as
+strategy.updated_at being wrapped in quotes 
+timestamp -> cc
+{{ strategy.updated_at }} -> '{{ strategy.updated_at }}'
+
+This is obviouly a terrible 'solution'. The proper way to do this
+would be to have the `snapshot_string_as_time` macro return
+a string that would render with single-quotes. But I've spent
+too long searching for how to do this with no success, and I
+admit defeat. 
+#}
 {% macro snapshot_staging_table(strategy, source_sql, target_relation) -%}
     {% if 'is_cc_strat' in strategy %}
         with snapshot_query as (
