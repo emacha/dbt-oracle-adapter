@@ -1,4 +1,4 @@
-{% materialization incremental, adapter='noracle' -%}
+{% materialization incremental, adapter='oracle' -%}
 
 
   {{ exceptions.raise_compiler_error('Incremental materializations not implemented!') }}

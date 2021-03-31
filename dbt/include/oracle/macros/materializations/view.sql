@@ -1,4 +1,4 @@
-{%- materialization view, adapter='noracle' -%}
+{%- materialization view, adapter='oracle' -%}
 
   {%- set identifier = model['alias'] -%}
   {%- set tmp_identifier = model['name'] + '__dbt_tmp' -%}
@@ -71,7 +71,7 @@
 {%- endmaterialization -%}
 
 
-{% macro noracle__create_view_as(relation, sql) -%}
+{% macro oracle__create_view_as(relation, sql) -%}
   create view {{ relation.render() }} as
     {{ sql }}
 {% endmacro %}

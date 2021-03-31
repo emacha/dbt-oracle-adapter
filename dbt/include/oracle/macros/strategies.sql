@@ -1,9 +1,9 @@
-{% macro noracle__snapshot_string_as_time(timestamp) %}
+{% macro oracle__snapshot_string_as_time(timestamp) %}
     {{ return(timestamp) }}
 {% endmacro %}
 
 
-{% macro noracle__snapshot_merge_sql(target, source, insert_cols) -%}
+{% macro oracle__snapshot_merge_sql(target, source, insert_cols) -%}
     {% set insert_cols_dest -%}
     {%- for col in insert_cols -%}
     DBT_INTERNAL_DEST.{{col}}{%- if not loop.last -%}, {%- endif -%}
@@ -303,7 +303,7 @@ admit defeat.
 {% endmacro %}
 
 
-{% macro noracle__snapshot_hash_arguments(args) -%}
+{% macro oracle__snapshot_hash_arguments(args) -%}
     standard_hash({%- for arg in args -%}
         coalesce(cast({{ arg }} as varchar2(1000) ), '')
         {% if not loop.last %} || '|' || {% endif %}

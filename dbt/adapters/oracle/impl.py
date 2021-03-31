@@ -2,13 +2,13 @@ import agate
 from typing import Dict
 from dbt.adapters.sql import SQLAdapter
 from dbt.utils import filter_null_values
-from dbt.adapters.noracle import NoracleConnectionManager
-from dbt.adapters.noracle.relation import NoracleRelation
+from dbt.adapters.oracle import OracleConnectionManager
+from dbt.adapters.oracle.relation import OracleRelation
 
 
-class NoracleAdapter(SQLAdapter):
-    ConnectionManager = NoracleConnectionManager
-    Relation = NoracleRelation
+class OracleAdapter(SQLAdapter):
+    ConnectionManager = OracleConnectionManager
+    Relation = OracleRelation
 
     @classmethod
     def date_function(cls):

@@ -1,5 +1,5 @@
 
-{% macro noracle__drop_relation(relation) -%}
+{% macro oracle__drop_relation(relation) -%}
   {% if relation.type == 'view' -%}
     {% call statement('drop_relation') -%}
       BEGIN
@@ -27,7 +27,7 @@
 {% endmacro %}
 
 
-{% macro noracle__rename_relation(from_relation, to_relation) -%}
+{% macro oracle__rename_relation(from_relation, to_relation) -%}
   {% if from_relation.type == 'view' and to_relation.type == 'view' -%}
     {# We cannot rename view in other schemas with Oracle. So we need to drop and recreate it. #}}
     {%- call statement('get_view_DDL', fetch_result=true) %}
@@ -72,14 +72,14 @@
 {% endmacro %}
 
 
-{% macro noracle__truncate_relation(relation) -%}
+{% macro oracle__truncate_relation(relation) -%}
   {% call statement('truncate_relation') -%}
     truncate table {{relation.include(database=false)}}
   {%- endcall %}
 {% endmacro %}
 
 
-{% macro noracle__list_relations_without_caching(schema_relation) %}
+{% macro oracle__list_relations_without_caching(schema_relation) %}
   {% call statement('list_relations_without_caching', fetch_result=True) -%}
     select
     upper('{{schema_relation.database}}') as database,
@@ -106,7 +106,7 @@
 {% endmacro %}
 
 
-{% macro noracle__list_schemas(database) -%}
+{% macro oracle__list_schemas(database) -%}
   {% call statement('list_schemas', fetch_result=True) -%}
     select distinct username as schema_name
     from sys.all_users
@@ -116,7 +116,7 @@
 {% endmacro %}
 
 
-{% macro noracle__drop_schema(database_name, schema_name) -%}
+{% macro oracle__drop_schema(database_name, schema_name) -%}
   {% set typename = adapter.type() %}
 
   {%- call statement('drop_schema') -%}
@@ -126,7 +126,7 @@
 {% endmacro %}
 
 
-{% macro noracle__create_schema(database_name, schema_name) -%}
+{% macro oracle__create_schema(database_name, schema_name) -%}
   {% set typename = adapter.type() %}
   {% set grant_types = ["create session", "create table", "create view", "create any trigger", "create any procedure", "create sequence",
                         "create synonym", "unlimited tablespace"] %}
@@ -144,7 +144,7 @@
 {% endmacro %}
 
 
-{% macro noracle__check_schema_exists(information_schema, schema) -%}
+{% macro oracle__check_schema_exists(information_schema, schema) -%}
   {% call statement('check_schema_exists', fetch_result=True) %}
     select count(*) from sys.all_users where username = upper('{{ schema }}')
   {% endcall %}
@@ -152,7 +152,7 @@
 {% endmacro %}
 
 
-{% macro noracle__get_columns_in_relation(relation) -%}
+{% macro oracle__get_columns_in_relation(relation) -%}
   {% call statement('get_columns_in_relation', fetch_result=True) %}
   select
     column_name as "column_name",
@@ -172,7 +172,7 @@
 {% endmacro %}
 
 
-{% macro noracle__current_timestamp() -%}
+{% macro oracle__current_timestamp() -%}
   {% call statement('current_timestamp', fetch_result=True) %}
     select localtimestamp from dual
   {% endcall %}
@@ -180,7 +180,7 @@
 {%- endmacro %}
 
 
-{% macro noracle__get_columns_in_query(select_sql) %}
+{% macro oracle__get_columns_in_query(select_sql) %}
     {% call statement('get_columns_in_query', fetch_result=True, auto_begin=False) -%}
           select * from (
               {{ select_sql }}

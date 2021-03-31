@@ -12,7 +12,7 @@
 {% endmacro %}
 
 
-{% macro noracle__make_temp_relation(base_relation, suffix) %}
+{% macro oracle__make_temp_relation(base_relation, suffix) %}
     {% set tmp_identifier = base_relation.identifier ~ suffix.upper() %}
     {% set tmp_relation = base_relation.incorporate(
                                 path={"identifier": tmp_identifier}) -%}
@@ -21,7 +21,7 @@
 {% endmacro %}
 
 
-{% materialization snapshot, adapter='noracle' %}
+{% materialization snapshot, adapter='oracle' %}
   {%- set config = model['config'] -%}
 
   {%- set target_table = model.get('alias', model.get('name')) -%}

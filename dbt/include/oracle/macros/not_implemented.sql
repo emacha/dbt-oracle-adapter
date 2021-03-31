@@ -7,9 +7,9 @@ This way at least the error message points us towards where
 the problem is.
 #}
 
-{% macro noracle__alter_column_type(relation) -%}
+{% macro oracle__alter_column_type(relation) -%}
   {% set msg -%}
-    alter_column_type not implemented for noracle
+    alter_column_type not implemented for oracle
   {%- endset %}
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}

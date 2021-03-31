@@ -1,5 +1,5 @@
 
-{% macro noracle__get_catalog(information_schema, schemas) -%}
+{% macro oracle__get_catalog(information_schema, schemas) -%}
   {% set query %}
     select 
         '{{ information_schema.database }}' as "table_database",

@@ -10,13 +10,8 @@ Without being more trouble than it's worth.
 
 TODO:
 - Macros in `not_implemented.sql`
-- Keep making the dbtspec tests to pass
-- Now we need to sort swappable from `base`. Failing on rename_relation from view to table or vs
-- data_test_ephemeral_models is getting recursive CTEs? Test a couple of layers in test_project
-
 - A decent readme
 - stick it in github
     - Use their docker thing for the test db?
     - CI/CD with actions
-- Rename all the terrible placeholder names (noracle)
-- incremental model probably hard to implement, leave for later.
+- Correctly implement the dbt classes e.g. types (https://docs.getdbt.com/reference/dbt-classes)

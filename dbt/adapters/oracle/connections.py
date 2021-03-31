@@ -14,7 +14,7 @@ import dbt
 
 
 @dataclass
-class NoracleCredentials(Credentials):
+class OracleCredentials(Credentials):
     host: str
     username: str
     password: str
@@ -22,7 +22,7 @@ class NoracleCredentials(Credentials):
 
     @property
     def type(self):
-        return "noracle"
+        return "oracle"
 
     def _connection_keys(self):
         """
@@ -31,8 +31,8 @@ class NoracleCredentials(Credentials):
         return ("host", "username", "port", "database", "schema")
 
 
-class NoracleConnectionManager(SQLConnectionManager):
-    TYPE = "noracle"
+class OracleConnectionManager(SQLConnectionManager):
+    TYPE = "oracle"
 
     @classmethod
     def open(cls, connection):

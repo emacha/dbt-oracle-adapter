@@ -1,5 +1,5 @@
 
-{% macro noracle__test_relationships(model, to, field) %}
+{% macro oracle__test_relationships(model, to, field) %}
 
 {% set column_name = kwargs.get('column_name', kwargs.get('from')) %}
 
