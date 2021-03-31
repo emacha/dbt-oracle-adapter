@@ -1,3 +1,8 @@
+{% macro noracle__snapshot_string_as_time(timestamp) %}
+    {{ return(timestamp) }}
+{% endmacro %}
+
+
 {% macro noracle__snapshot_merge_sql(target, source, insert_cols) -%}
     {% set insert_cols_dest -%}
     {%- for col in insert_cols -%}
@@ -31,6 +36,119 @@
 
 
 {% macro snapshot_staging_table(strategy, source_sql, target_relation) -%}
+    {% if 'is_cc_strat' in strategy %}
+        with snapshot_query as (
+
+        {{ source_sql }}
+
+    ),
+
+    snapshotted_data as (
+
+        select {{ target_relation }}.*,
+            {{ strategy.unique_key }} as dbt_unique_key
+
+        from {{ target_relation }}
+        where dbt_valid_to is null
+
+    ),
+
+    insertions_source_data as (
+
+        select
+            snapshot_query.*,
+            {{ strategy.unique_key }} as dbt_unique_key,
+            '{{ strategy.updated_at }}' as dbt_updated_at,
+            '{{ strategy.updated_at }}' as dbt_valid_from,
+            nullif('{{ strategy.updated_at }}', '{{ strategy.updated_at }}') as dbt_valid_to,
+            {{ strategy.scd_id }} as dbt_scd_id
+
+        from snapshot_query
+    ),
+
+    updates_source_data as (
+
+        select
+            snapshot_query.*,
+            {{ strategy.unique_key }} as dbt_unique_key,
+            '{{ strategy.updated_at }}' as dbt_updated_at,
+            '{{ strategy.updated_at }}' as dbt_valid_from,
+            '{{ strategy.updated_at }}' as dbt_valid_to
+
+        from snapshot_query
+    ),
+
+    {%- if strategy.invalidate_hard_deletes %}
+
+    deletes_source_data as (
+
+        select 
+            snapshot_query.*,
+            {{ strategy.unique_key }} as dbt_unique_key
+        from snapshot_query
+    ),
+    {% endif %}
+
+    insertions as (
+
+        select
+            'insert' as dbt_change_type,
+            source_data.*
+
+        from insertions_source_data source_data
+        left outer join snapshotted_data on snapshotted_data.dbt_unique_key = source_data.dbt_unique_key
+        where snapshotted_data.dbt_unique_key is null
+           or (
+                snapshotted_data.dbt_unique_key is not null
+            and (
+                {{ strategy.row_changed }}
+            )
+        )
+
+    ),
+
+    updates as (
+
+        select
+            'update' as dbt_change_type,
+            source_data.*,
+            snapshotted_data.dbt_scd_id
+
+        from updates_source_data source_data
+        join snapshotted_data on snapshotted_data.dbt_unique_key = source_data.dbt_unique_key
+        where (
+            {{ strategy.row_changed }}
+        )
+    )
+
+    {%- if strategy.invalidate_hard_deletes -%}
+    ,
+
+    deletes as (
+    
+        select
+            'delete' as dbt_change_type,
+            source_data.*,
+            {{ snapshot_get_time() }} as dbt_valid_from,
+            {{ snapshot_get_time() }} as dbt_updated_at,
+            {{ snapshot_get_time() }} as dbt_valid_to,
+            snapshotted_data.dbt_scd_id
+    
+        from snapshotted_data
+        left join deletes_source_data source_data on snapshotted_data.dbt_unique_key = source_data.dbt_unique_key
+        where source_data.dbt_unique_key is null
+    )
+    {%- endif %}
+
+    select * from insertions
+    union all
+    select * from updates
+    {%- if strategy.invalidate_hard_deletes %}
+    union all
+    select * from deletes
+    {%- endif %}
+    
+    {% else %}
 
     with snapshot_query as (
 
@@ -142,12 +260,22 @@
     union all
     select * from deletes
     {%- endif %}
+    {% endif %}
 
 {%- endmacro %}
 
 
 {% macro build_snapshot_table(strategy, sql) %}
-
+    {% if 'is_cc_strat' in strategy %}
+        select sbq.*,
+        {{ strategy.scd_id }} as dbt_scd_id,
+        '{{ strategy.updated_at }}' as dbt_updated_at,
+        '{{ strategy.updated_at }}' as dbt_valid_from,
+        cast(nullif('{{ strategy.updated_at }}', '{{ strategy.updated_at }}') as varchar2(1000)) as dbt_valid_to
+    from (
+        {{ sql }}
+    ) sbq
+    {% else %}
     select sbq.*,
         {{ strategy.scd_id }} as dbt_scd_id,
         {{ strategy.updated_at }} as dbt_updated_at,
@@ -156,7 +284,7 @@
     from (
         {{ sql }}
     ) sbq
-
+    {% endif %}
 {% endmacro %}
 
 
@@ -174,7 +302,7 @@
     {% set invalidate_hard_deletes = config.get('invalidate_hard_deletes', false) %}
     
     {% set select_current_time -%}
-        select {{ snapshot_get_time() }} from dual as snapshot_start
+        select '{{ snapshot_get_time() }}' as snapshot_start from dual 
     {%- endset %}
 
     {#-- don't access the column by name, to avoid dealing with casing issues on snowflake #}
@@ -214,12 +342,17 @@
     {%- endset %}
 
     {% set scd_id_expr = snapshot_hash_arguments([primary_key, updated_at]) %}
+    {% set scd_id_expr %}
+        standard_hash(coalesce(cast({{ primary_key }} as varchar2(1000)), '')
+        || '|' || coalesce(cast('{{ updated_at }}' as varchar2(1000)), ''), 'MD5')
+    {% endset %}
 
     {% do return({
         "unique_key": primary_key,
         "updated_at": updated_at,
         "row_changed": row_changed_expr,
         "scd_id": scd_id_expr,
-        "invalidate_hard_deletes": invalidate_hard_deletes
+        "invalidate_hard_deletes": invalidate_hard_deletes,
+        "is_cc_strat": True
     }) %}
 {% endmacro %}
