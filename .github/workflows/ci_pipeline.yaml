@@ -44,4 +44,4 @@ jobs:
 
     - name: Run dbtspec tests
       run: |
-        $HOME/.poetry/bin/poetry pytest
+        $HOME/.poetry/bin/poetry run pytest
