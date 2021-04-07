@@ -29,6 +29,5 @@ jobs:
 
     - name: Run dbtspec tests
       run: |
-        python -m pip install pytest
-        echo "Running test at $GITHUB_WORKSPACE/specs/oracle.dbtspec"
+        python -m pip install pytest pytest-dbt-adapter
         pytest $GITHUB_WORKSPACE/specs/oracle.dbtspec
