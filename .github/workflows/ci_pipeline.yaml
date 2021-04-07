@@ -4,18 +4,29 @@ on: [push]
 
 jobs:
   ci-pipeline:
-    services:
-      oracle:
-        image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
-        ports:
-          - 1521:1521
-        # Override health check. Read Oracle db log and look for for string saying db is created. Plus tinker with intervals
-        options: --health-cmd "cat /opt/oracle/cfgtoollogs/dbca/XE/XE.log | grep -q 'Database creation complete' 2> /dev/null" --health-interval 30s --health-timeout 2s --health-retries 20 --health-start-period 10m
+    # services:
+    #   oracle:
+    #     image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
+    #     ports:
+    #       - 1521:1521
+    #     # Override health check. Read Oracle db log and look for for string saying db is created. Plus tinker with intervals
+    #     options: --health-cmd "cat /opt/oracle/cfgtoollogs/dbca/XE/XE.log | grep -q 'Database creation complete' 2> /dev/null" --health-interval 30s --health-timeout 2s --health-retries 20 --health-start-period 10m
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install Oracle db client
+      run: |
+        wget https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basiclite-linux.x64-21.1.0.0.0.zip
+        unzip instantclient-basiclite-linux.x64-21.1.0.0.0.zip
+        sudo mkdir /opt/oracle
+        sudo mv instantclient_21_1 /opt/oracle
+        sudo apt-get install libaio1
+        export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1:$LD_LIBRARY_PATH
+
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
