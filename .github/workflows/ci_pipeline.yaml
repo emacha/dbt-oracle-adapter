@@ -4,13 +4,13 @@ on: [push]
 
 jobs:
   ci-pipeline:
-    # services:
-    #   oracle:
-    #     image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
-    #     ports:
-    #       - 1521:1521
-    #     # Override health check. Read Oracle db log and look for for string saying db is created. Plus tinker with intervals
-    #     options: --health-cmd "cat /opt/oracle/cfgtoollogs/dbca/XE/XE.log | grep -q 'Database creation complete' 2> /dev/null" --health-interval 30s --health-timeout 2s --health-retries 20 --health-start-period 10m
+    services:
+      oracle:
+        image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
+        ports:
+          - 1521:1521
+        # Override health check. Read Oracle db log and look for for string saying db is created. Plus tinker with intervals
+        options: --health-cmd "cat /opt/oracle/cfgtoollogs/dbca/XE/XE.log | grep -q 'Database creation complete' 2> /dev/null" --health-interval 30s --health-timeout 2s --health-retries 20 --health-start-period 10m
 
     runs-on: ubuntu-latest
 
