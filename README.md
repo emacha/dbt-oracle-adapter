@@ -1,17 +1,51 @@
-# Oracle DBT Adapter
+<p align="center">
+  <img src="https://raw.githubusercontent.com/silentsokolov/dbt-clickhouse/master/etc/dbt-logo-full.svg" alt="dbt logo" width="300"/>
+</p>
 
-This is an attempt to implement a dbt adapter for Oracle from
-scratch. Half as a learning exercise, half so I can have 
-a nicer workflow at my job.
+# dbt-oracle-adapter
 
-I don't think I'll ever implement all features,
-but I want to at least reach a point where it's usable.
-Without being more trouble than it's worth.
+This plugin ports [dbt](https://getdbt.com) functionality to [Oracle](https://www.oracle.com/database/).
 
-TODO:
-- Macros in `not_implemented.sql`
-- A decent readme
+This is only tested against Oracle XE-18c and dbt 0.19
+
+### Installation
+
+Not deployed yet!
+
+### Supported features
+
+- [x] Table materialization
+- [x] View materialization
+- [x] Ephemeral materialization
+- [x] Tests
+- [x] Documentation
+- [x] Sources
+- [x] Seeds
+- [x] Snapshots
+- [ ] Incremental materialization
+
+# Example Profile
+
+```
+your_profile_name:
+  target: dev
+  outputs:
+    dev:
+      type: oracle
+      username: [username/schema]
+      password: [1234]
+      host: [localhost]
+      database: [xepdb1]
+      schema: [username/schema]
+
+      # optional
+      port: [port]  # default 1521
+```
+
+# TODO:
+- Implement alter column type macro
+- A decent*er* readme
 - stick it in github
     - Use their docker thing for the test db?
     - CI/CD with actions
-- Correctly implement the dbt classes e.g. types (https://docs.getdbt.com/reference/dbt-classes)
+- Do something about the hardcoded Varchar2 precisions?
