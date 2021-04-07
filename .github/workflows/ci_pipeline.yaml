@@ -3,10 +3,15 @@ name: dbt-oracle Testing
 on: [push]
 
 jobs:
-  build:
+  ci-pipeline:
+    services:
+      oracle:
+        image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
+        # Map port 8080 on the Docker host to port 80 on the nginx container
+        ports:
+          - 1521:1521
 
     runs-on: ubuntu-latest
-    container: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
 
     steps:
     - uses: actions/checkout@v2
