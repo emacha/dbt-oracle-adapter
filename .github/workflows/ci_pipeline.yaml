@@ -24,6 +24,8 @@ jobs:
         sudo mkdir /opt/oracle
         sudo mv instantclient_21_1 /opt/oracle
         sudo apt-get install libaio1
+        sudo sh -c "echo /opt/oracle/instantclient_21_1 > /etc/ld.so.conf.d/oracle-instantclient.conf"
+        sudo ldconfig
         export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1:$LD_LIBRARY_PATH
 
 
