@@ -1,4 +1,4 @@
-name: dbt-oracle Testing
+name: Tests
 
 on: [push]
 
