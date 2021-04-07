@@ -1,10 +1,9 @@
-on:
-  push:
-    tags:
-      - '*'
+name: Deploy
+
+on: [release]
 
 jobs:
-  ci-pipeline:
+  Run-tests-then-deploy:
     # services:
     #   oracle:
     #     image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
@@ -29,7 +28,6 @@ jobs:
         sudo ldconfig
         export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1:$LD_LIBRARY_PATH
 
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -43,10 +41,10 @@ jobs:
       run: |
         $HOME/.poetry/bin/poetry install
     
-    - name: Publish package
-      run: |
-        $HOME/.poetry/bin/poetry publish --build --dry-run -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
-
     - name: Run dbtspec tests
       run: |
         $HOME/.poetry/bin/poetry run pytest
+
+    - name: Publish package
+      run: |
+        $HOME/.poetry/bin/poetry publish --build --dry-run -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
