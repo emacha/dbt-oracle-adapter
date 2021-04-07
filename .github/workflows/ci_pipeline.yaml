@@ -31,7 +31,9 @@ jobs:
       run: |
         python -m pip install pytest
         echo "$GITHUB_WORKSPACE"
-        echo "ls"
-        echo "ls specs"  
+        ls
+        ls specs
+        ls /home/runner/work/dbt-oracle-adapter/dbt-oracle-adapter
+        ls $GITHUB_WORKSPACE
 
         pytest
