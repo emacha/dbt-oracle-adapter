@@ -40,9 +40,8 @@ jobs:
   
     - name: Install package
       run: |
-        $HOME/.poetry/bin/poetry shell
         $HOME/.poetry/bin/poetry install
 
     - name: Run dbtspec tests
       run: |
-        pytest
+        $HOME/.poetry/bin/poetry pytest
