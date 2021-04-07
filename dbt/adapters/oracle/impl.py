@@ -1,7 +1,9 @@
-import agate
 from typing import Dict
+
+import agate
 from dbt.adapters.sql import SQLAdapter
 from dbt.utils import filter_null_values
+
 from dbt.adapters.oracle import OracleConnectionManager
 from dbt.adapters.oracle.relation import OracleRelation
 
@@ -21,41 +23,37 @@ class OracleAdapter(SQLAdapter):
         self, database: str, schema: str, identifier: str
     ) -> Dict[str, str]:
         quoting = self.config.quoting
-        if identifier is not None and quoting['identifier'] is False:
+        if identifier is not None and quoting["identifier"] is False:
             identifier = identifier.upper()
 
-        if schema is not None and quoting['schema'] is False:
+        if schema is not None and quoting["schema"] is False:
             schema = schema.upper()
 
-        if database is not None and quoting['database'] is False:
+        if database is not None and quoting["database"] is False:
             database = database.upper()
 
-        return filter_null_values({
-            'database': database,
-            'identifier': identifier,
-            'schema': schema,
-        })
+        return filter_null_values(
+            {
+                "database": database,
+                "identifier": identifier,
+                "schema": schema,
+            }
+        )
 
     @classmethod
     def convert_text_type(cls, agate_table: agate.Table, col_idx: int) -> str:
         return "varchar(4000)"
 
     @classmethod
-    def convert_number_type(
-        cls, agate_table: agate.Table, col_idx: int
-    ) -> str:
+    def convert_number_type(cls, agate_table: agate.Table, col_idx: int) -> str:
         return "number"
 
     @classmethod
-    def convert_boolean_type(
-            cls, agate_table: agate.Table, col_idx: int
-    ) -> str:
+    def convert_boolean_type(cls, agate_table: agate.Table, col_idx: int) -> str:
         return "number(1)"
 
     @classmethod
-    def convert_datetime_type(
-            cls, agate_table: agate.Table, col_idx: int
-    ) -> str:
+    def convert_datetime_type(cls, agate_table: agate.Table, col_idx: int) -> str:
         return "timestamp"
 
     @classmethod
@@ -71,7 +69,7 @@ class OracleAdapter(SQLAdapter):
         relation_a,
         relation_b,
         column_names=None,
-        except_operator: str = 'EXCEPT',
+        except_operator: str = "EXCEPT",
     ) -> str:
         """Generate SQL for a query that returns a single row with a two
         columns: the number of rows that are different between the two
@@ -83,7 +81,7 @@ class OracleAdapter(SQLAdapter):
             names = sorted((self.quote(c.name) for c in columns))
         else:
             names = sorted((self.quote(n) for n in column_names))
-        columns_csv = ', '.join(names)
+        columns_csv = ", ".join(names)
 
         sql = COLUMNS_EQUAL_SQL.format(
             columns=columns_csv,
@@ -95,10 +93,12 @@ class OracleAdapter(SQLAdapter):
         return sql
 
     def timestamp_add_sql(
-        self, add_to: str, number: int = 1, interval: str = 'hour'
+        self, add_to: str, number: int = 1, interval: str = "hour"
     ) -> str:
         if interval != "hour":
-            raise NotImplementedError(f"Interval of type {interval} not allowed, use 'hour'")
+            raise NotImplementedError(
+                f"Interval of type {interval} not allowed, use 'hour'"
+            )
 
         return f"{add_to} + interval '{number}' {interval}"
 

@@ -8,9 +8,9 @@ from dbt.adapters.base import Credentials
 from dbt.adapters.sql import SQLConnectionManager
 from dbt.contracts.connection import Connection
 from dbt.logger import GLOBAL_LOGGER as logger
-from dbt import flags
 
 import dbt
+from dbt import flags
 
 
 @dataclass
@@ -129,13 +129,14 @@ class OracleConnectionManager(SQLConnectionManager):
         if flags.STRICT_MODE:
             if not isinstance(connection, Connection):
                 raise dbt.exceptions.CompilerException(
-                    f'In begin, got {connection} - not a Connection!'
+                    f"In begin, got {connection} - not a Connection!"
                 )
 
         if connection.transaction_open is True:
             raise dbt.exceptions.InternalException(
                 'Tried to begin a new transaction on connection "{}", but '
-                'it already had one open!'.format(connection.name))
+                "it already had one open!".format(connection.name)
+            )
 
         connection.handle.begin()
         connection.transaction_open = True
@@ -146,15 +147,16 @@ class OracleConnectionManager(SQLConnectionManager):
         if flags.STRICT_MODE:
             if not isinstance(connection, Connection):
                 raise dbt.exceptions.CompilerException(
-                    f'In commit, got {connection} - not a Connection!'
+                    f"In commit, got {connection} - not a Connection!"
                 )
 
         if connection.transaction_open is False:
             raise dbt.exceptions.InternalException(
                 'Tried to commit transaction on connection "{}", but '
-                'it does not have one open!'.format(connection.name))
+                "it does not have one open!".format(connection.name)
+            )
 
-        logger.debug('On {}: COMMIT'.format(connection.name))
+        logger.debug("On {}: COMMIT".format(connection.name))
         connection.handle.commit()
         connection.transaction_open = False
 
