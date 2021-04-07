@@ -41,6 +41,10 @@ jobs:
     - name: Install package
       run: |
         $HOME/.poetry/bin/poetry install
+    
+    - name: Publish package
+      run: |
+        $HOME/.poetry/bin/poetry publish --build --dry-run -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
 
     - name: Run dbtspec tests
       run: |
