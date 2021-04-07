@@ -3,7 +3,7 @@ name: Tests
 on: [push]
 
 jobs:
-  ci-pipeline:
+  tests-pipeline:
     services:
       oracle:
         image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
@@ -33,13 +33,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    
+    - name: Install poetry
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
   
     - name: Install package
       run: |
-        python -m pip install --upgrade pip
-        pip install .
+        $HOME/.poetry/bin/poetry install
 
     - name: Run dbtspec tests
       run: |
-        python -m pip install pytest pytest-dbt-adapter
-        pytest $GITHUB_WORKSPACE/specs/oracle.dbtspec
+        $HOME/.poetry/bin/poetry run pytest

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "dbt-oracle-fresh"
+name = "dbt-oracledb"
 version = "0.1.0"
-description = ""
+description = "DBT adapter for Oracle databases"
 authors = ["emacha <15370927+emacha@users.noreply.github.com>"]
 
 packages = [

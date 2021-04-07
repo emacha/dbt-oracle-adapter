@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from dbt.adapters.base.relation import BaseRelation
 from dbt.contracts.relation import Policy
 
@@ -10,4 +11,4 @@ class OracleRelation(BaseRelation):
 
     @staticmethod
     def add_ephemeral_prefix(name: str):
-        return f'prefix__dbt__cte__{name}'
+        return f"prefix__dbt__cte__{name}"
