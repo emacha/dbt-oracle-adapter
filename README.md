@@ -2,6 +2,8 @@
   <img src="https://raw.githubusercontent.com/silentsokolov/dbt-clickhouse/master/etc/dbt-logo-full.svg" alt="dbt logo" width="300"/>
 </p>
 
+[![Tests](https://github.com/emacha/dbt-oracle-adapter/actions/workflows/tests.yaml/badge.svg)](https://github.com/emacha/dbt-oracle-adapter/actions/workflows/tests.yaml)
+
 # dbt-oracle-adapter
 
 This plugin ports [dbt](https://getdbt.com) functionality to [Oracle](https://www.oracle.com/database/).
@@ -10,7 +12,7 @@ This is only tested against Oracle XE-18c and dbt 0.19
 
 ### Installation
 
-Not deployed yet!
+`pip install dbt-oracledb` :cake:
 
 ### Supported features
 
@@ -45,7 +47,7 @@ your_profile_name:
 # TODO:
 - Implement alter column type macro
 - A decent*er* readme
-- stick it in github
-    - Use their docker thing for the test db?
-    - CI/CD with actions
 - Do something about the hardcoded Varchar2 precisions?
+- Improve the schema creation. Maybe set the password
+  and permissions the same as creator?
+
