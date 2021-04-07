@@ -3,7 +3,7 @@ name: Tests
 on: [push]
 
 jobs:
-  ci-pipeline:
+  tests-pipeline:
     # services:
     #   oracle:
     #     image: silverax/dbt-oracle-adapter:oracle-18.4.0-xe
